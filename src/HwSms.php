@@ -21,7 +21,7 @@ class HwSms
     protected $appSecret;
     protected $sender;
 
-    public function __construct($url, $appKey, $appSecret, $sender)
+    public function __construct($url = 'https://rtcsms.cn-north-1.myhuaweicloud.com:10743/sms/batchSendSms/v1', $appKey, $appSecret, $sender)
     {
         $this->url = $url;
         $this->appKey = $appKey;
@@ -29,13 +29,13 @@ class HwSms
         $this->sender = $sender;
     }
 
-    public function send($url, $appKey, $appSecret, $sender, $templateId, $signature, $mobile, $statusCallback = '', $param)
+    public function send($templateId, $signature, $mobile, $statusCallback = '', $param)
     {
         $client = new Client();
         try {
-            $response = $client->request('POST', $url, [
+            $response = $client->request('POST', $this->url, [
                 'form_params' => [
-                    'from' => $sender,
+                    'from' => $this->sender,
                     'to' => $mobile,
                     'templateId' => $templateId,
                     'templateParas' => $param,
@@ -44,17 +44,17 @@ class HwSms
                 ],
                 'headers' => [
                     'Authorization' => 'WSSE realm="SDP",profile="UsernameToken",type="Appkey"',
-                    'X-WSSE' => $this->buildWsseHeader($appKey, $appSecret)
+                    'X-WSSE' => $this->buildWsseHeader($this->appKey, $this->appSecret)
                 ],
                 'verify' => false //为防止因HTTPS证书认证失败造成API调用失败，需要先忽略证书信任问题
             ]);
-            echo Psr7\str($response); //打印响应信息
+            return Psr7\str($response); //打印响应信息
         } catch (RequestException $e) {
-            echo $e;
-            echo Psr7\str($e->getRequest()), "\n";
-            if ($e->hasResponse()) {
-                echo Psr7\str($e->getResponse());
-            }
+            return $e;
+//            return Psr7\str($e->getRequest());
+//            if ($e->hasResponse()) {
+//                return Psr7\str($e->getResponse());
+//            }
         }
     }
 
