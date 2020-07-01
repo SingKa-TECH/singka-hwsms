@@ -16,48 +16,57 @@ use GuzzleHttp\Exception\RequestException;
 
 class HwSms
 {
-    protected $url;
-    protected $appKey;
-    protected $appSecret;
-    protected $sender;
+    protected $config;
+    protected $status;
 
-    public function __construct($url = 'https://rtcsms.cn-north-1.myhuaweicloud.com:10743/sms/batchSendSms/v1', $appKey, $appSecret, $sender)
+    public function __construct($config = ['url' => 'https://rtcsms.cn-north-1.myhuaweicloud.com:10743/sms/batchSendSms/v1', 'appKey' =>'', 'appSecret' => '', 'sender' => ''])
     {
-        $this->url = $url;
-        $this->appKey = $appKey;
-        $this->appSecret = $appSecret;
-        $this->sender = $sender;
+        if (empty($config['appKey']) || empty($config['appSecret']) || empty($config['sender'])) {
+            $this->status = false;
+        } else {
+            $this->status = true;
+            $this->config = $config;
+        }
     }
 
     public function send($templateId, $signature, $mobile, $statusCallback = '', $param)
     {
-        $client = new Client();
-        try {
-            $response = $client->request('POST', $this->url, [
-                'form_params' => [
-                    'from' => $this->sender,
-                    'to' => $mobile,
-                    'templateId' => $templateId,
-                    'templateParas' => $param,
-                    'statusCallback' => $statusCallback,
-                    'signature' => $signature
-                ],
-                'headers' => [
-                    'Authorization' => 'WSSE realm="SDP",profile="UsernameToken",type="Appkey"',
-                    'X-WSSE' => $this->buildWsseHeader($this->appKey, $this->appSecret)
-                ],
-                'verify' => false //为防止因HTTPS证书认证失败造成API调用失败，需要先忽略证书信任问题
-            ]);
-            return Psr7\str($response); //打印响应信息
-        } catch (RequestException $e) {
-            return $e;
-//            return Psr7\str($e->getRequest());
-//            if ($e->hasResponse()) {
-//                return Psr7\str($e->getResponse());
-//            }
+        if ($this->status) {
+            $client = new Client();
+            try {
+                $response = $client->request('POST', $this->config['url'], [
+                    'form_params' => [
+                        'from' => $this->config['sender'],
+                        'to' => $mobile,
+                        'templateId' => $templateId,
+                        'templateParas' => $param,
+                        'statusCallback' => $statusCallback,
+                        'signature' => $signature
+                    ],
+                    'headers' => [
+                        'Authorization' => 'WSSE realm="SDP",profile="UsernameToken",type="Appkey"',
+                        'X-WSSE' => $this->buildWsseHeader($this->config['appKey'], $this->config['appSecret'])
+                    ],
+                    'verify' => false //为防止因HTTPS证书认证失败造成API调用失败，需要先忽略证书信任问题
+                ]);
+                $result = $response->getBody();
+                $result = json_decode($result, true);
+                $data['code'] = $result['code'];
+                $data['msg'] = $result['description'];
+                $data['result'] = $result['result'][0];
+            } catch (RequestException $e) {
+                $result = $e->getResponse()->getBody();
+                $result = json_decode($result, true);
+                $data['code'] = $result['code'];
+                $data['msg'] = $result['description'];
+            }
+        } else {
+            $data['code'] = 202;
+            $data['msg'] = '配置有误，请检查';
         }
-    }
+        return $data;
 
+    }
 
     /**
      * 构造X-WSSE参数值
