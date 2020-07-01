@@ -42,7 +42,7 @@ class Index
         $config['appSecret'] = 'U58fd****************0o4N';
         $config['sender'] = 'csms12345678';
         $sms = new HwSms($config);
-        $result = $sms->singleSend('模板ID', '短信签名', '手机号码（多个号码可以用英文逗号隔开）', '短信发送状态返回接收地址，可以为空', '短信变量数组');
+        $result = $sms->send('模板ID', '短信签名', '手机号码（多个号码可以用英文逗号隔开）', '短信发送状态返回接收地址，可以为空', '短信变量数组');
         if ($result['code'] == '000000') {
             echo '发送成功';
         } else {
