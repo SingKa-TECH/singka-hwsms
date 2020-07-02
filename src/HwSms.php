@@ -29,7 +29,7 @@ class HwSms
         }
     }
 
-    public function send($templateId, $signature, $mobile, $statusCallback = '', $param)
+    public function send($templateId, $mobile, $param)
     {
         if ($this->status) {
             $client = new Client();
@@ -40,8 +40,8 @@ class HwSms
                         'to' => $mobile,
                         'templateId' => $templateId,
                         'templateParas' => $param,
-                        'statusCallback' => $statusCallback,
-                        'signature' => $signature
+                        'statusCallback' => $this->config['statusCallback'],
+                        'signature' => $this->config['signature']
                     ],
                     'headers' => [
                         'Authorization' => 'WSSE realm="SDP",profile="UsernameToken",type="Appkey"',

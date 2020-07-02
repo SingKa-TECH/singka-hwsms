@@ -30,10 +30,12 @@ class Index
     /**
     * 短信发送示例
     *
-    * @url          华为云短信APP接入地址+接口访问URI
-    * @appKey       华为云短信appKey
-    * @appSecret    华为云短信appSecret
-    * @sender       国内短信签名通道号或国际/港澳台短信通道号
+    * @url              华为云短信APP接入地址+接口访问URI
+    * @appKey           华为云短信appKey
+    * @appSecret        华为云短信appSecret
+    * @sender           国内短信签名通道号或国际/港澳台短信通道号
+    * @signature        华为云短信签名
+    * @statusCallback   短信发送状态返回接收地址，可以为空
     */
     public function smsDemo()
     {
@@ -41,8 +43,10 @@ class Index
         $config['appKey'] = 'PkT889B*************wM0GAi';
         $config['appSecret'] = 'U58fd****************0o4N';
         $config['sender'] = 'csms12345678';
+        $config['signature'] = '短信签名';
+        $config['statusCallback'] = '短信发送状态返回接收地址，可以为空';
         $sms = new HwSms($config);
-        $result = $sms->send('模板ID', '短信签名', '手机号码（多个号码可以用英文逗号隔开）', '短信发送状态返回接收地址，可以为空', '短信变量数组');
+        $result = $sms->send('模板ID', '手机号码（多个号码可以用英文逗号隔开）', '短信变量数组');
         if ($result['code'] == '000000') {
             echo '发送成功';
         } else {
