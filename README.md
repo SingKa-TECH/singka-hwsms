@@ -37,7 +37,7 @@ class Index
     */
     public function smsDemo()
     {
-        $config['url'] = 'https://rtcsms.cn-north-1.myhuaweicloud.com:10743/sms/batchSendSms/v1';
+        $config['url'] = 'https://rtcsms.cn-north-1.myhuaweicloud.com:10743';
         $config['appKey'] = 'PkT889B*************wM0GAi';
         $config['appSecret'] = 'U58fd****************0o4N';
         $config['sender'] = 'csms12345678';

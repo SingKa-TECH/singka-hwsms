@@ -19,7 +19,7 @@ class HwSms
     protected $config;
     protected $status;
 
-    public function __construct($config = ['url' => 'https://rtcsms.cn-north-1.myhuaweicloud.com:10743/sms/batchSendSms/v1', 'appKey' =>'', 'appSecret' => '', 'sender' => ''])
+    public function __construct($config = ['url' => 'https://rtcsms.cn-north-1.myhuaweicloud.com:10743', 'appKey' =>'', 'appSecret' => '', 'sender' => ''])
     {
         if (empty($config['appKey']) || empty($config['appSecret']) || empty($config['sender'])) {
             $this->status = false;
@@ -34,7 +34,7 @@ class HwSms
         if ($this->status) {
             $client = new Client();
             try {
-                $response = $client->request('POST', $this->config['url'], [
+                $response = $client->request('POST', $this->config['url'].'/sms/batchSendSms/v1', [
                     'form_params' => [
                         'from' => $this->config['sender'],
                         'to' => $mobile,
